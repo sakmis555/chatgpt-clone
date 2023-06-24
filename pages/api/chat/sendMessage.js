@@ -50,7 +50,7 @@ export default async function handler(req) {
         onBeforeStream: ({ emit }) => {
           emit(chatId, "newChatId");
         },
-        onAfterStream: async ({ emit, fullContent }) => {
+        onAfterStream: async ({ fullContent }) => {
           await fetch(
             `${req.headers.get("origin")}/api/chat/addMessageToChat`,
             {

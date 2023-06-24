@@ -1,12 +1,16 @@
+import { getSession } from "@auth0/nextjs-auth0";
 import { ChatSidebar } from "components/ChatSidebar";
 import { Message } from "components/Message";
+import clientPromise from "lib/mongodb";
+import { ObjectId } from "mongodb";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { streamReader } from "openai-edge-stream";
 import { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
 
-export default function ChatPage({ chatId }) {
+export default function ChatPage({ chatId, title, messages }) {
+  console.log("PROPS:", title, messages);
   const [messageText, setMessageText] = useState("");
   const [incomingMessage, setIncomingMessage] = useState("");
   const [newChatMessages, setNewChatMessages] = useState([]);
@@ -104,9 +108,26 @@ export default function ChatPage({ chatId }) {
 
 export const getServerSideProps = async (context) => {
   const chatId = context.params?.chatId?.[0] || null;
+  if (chatId) {
+    const { user } = await getSession(context.req, context.res);
+    const client = await clientPromise;
+    const db = client.db("TalkGPT");
+    const chat = await db.collection("chats").findOne({
+      userId: user.sub,
+      _id: new ObjectId(chatId),
+    });
+    return {
+      props: {
+        chatId,
+        title: chat.title,
+        messages: chat.messages.map((message) => ({
+          ...message,
+          _id: uuid(),
+        })),
+      },
+    };
+  }
   return {
-    props: {
-      chatId,
-    },
+    props: {},
   };
 };

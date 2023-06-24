@@ -7,9 +7,11 @@ export const config = {
 
 export default async function handler(req) {
   try {
+    console.log("random text before handler func");
     const { message } = await req.json();
+    console.log(message);
     const stream = await OpenAIEdgeStream(
-      `https://api.openai.com/v1/chat/completions`,
+      "https://api.openai.com/v1/chat/completions",
       {
         headers: {
           "content-type": "application/json",

@@ -9,7 +9,7 @@ import { streamReader } from "openai-edge-stream";
 import { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
 
-export default function ChatPage({ chatId, title, messages }) {
+export default function ChatPage({ chatId, title, messages = [] }) {
   console.log("PROPS:", title, messages);
   const [messageText, setMessageText] = useState("");
   const [incomingMessage, setIncomingMessage] = useState("");
@@ -18,6 +18,10 @@ export default function ChatPage({ chatId, title, messages }) {
   const [newChatId, setNewChatId] = useState(null);
   const router = useRouter();
 
+  useEffect(() => {
+    setNewChatMessages([]);
+    setNewChatId(null);
+  },[chatId])
   useEffect(() => {
     if (!generatingResponse && newChatId) {
       setNewChatId(null);
@@ -63,8 +67,11 @@ export default function ChatPage({ chatId, title, messages }) {
       }
     });
 
+    setIncomingMessage("");
     setGeneratingResponse(false);
   };
+
+  const allMessages = [...messages, ...newChatMessages];
   return (
     <>
       <Head>
@@ -74,7 +81,7 @@ export default function ChatPage({ chatId, title, messages }) {
         <ChatSidebar chatId={chatId} />
         <div className="flex flex-col overflow-hidden bg-gray-700">
           <div className="flex-1 overflow-scroll text-white">
-            {newChatMessages.map((message) => (
+            {allMessages.map((message) => (
               <Message
                 key={message._id}
                 role={message.role}

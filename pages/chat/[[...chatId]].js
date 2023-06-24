@@ -16,18 +16,37 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   const [newChatMessages, setNewChatMessages] = useState([]);
   const [generatingResponse, setGeneratingResponse] = useState(false);
   const [newChatId, setNewChatId] = useState(null);
+  const [fullMessage, setFullMessage] = useState("");
   const router = useRouter();
 
+  // when our route changes, reset our state items
   useEffect(() => {
     setNewChatMessages([]);
     setNewChatId(null);
-  },[chatId])
+  }, [chatId]);
+
+  //if we have created a new chat
   useEffect(() => {
     if (!generatingResponse && newChatId) {
       setNewChatId(null);
       router.push(`/chat/${newChatId}`);
     }
   }, [newChatId, generatingResponse, router]);
+
+  // save the newly streamed messages to new chat messages
+  useEffect(() => {
+    if (!generatingResponse && fullMessage) {
+      setNewChatMessages((prev) => [
+        ...prev,
+        {
+          _id: uuid(),
+          role: "assistant",
+          content: fullMessage,
+        },
+      ]);
+      setFullMessage("");
+    }
+  }, [generatingResponse, fullMessage]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setGeneratingResponse(true);
@@ -50,7 +69,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ message: messageText }),
+      body: JSON.stringify({ chatId, message: messageText }),
     });
     const data = response.body;
     if (!data) {
@@ -58,15 +77,18 @@ export default function ChatPage({ chatId, title, messages = [] }) {
     }
 
     const reader = data.getReader();
+    let content = "";
     await streamReader(reader, (message) => {
       console.log("message", message);
       if (message.event === "newChatId") {
         setNewChatId(message.content);
       } else {
         setIncomingMessage((s) => `${s}${message.content}`);
+        content = content + message.content;
       }
     });
 
+    setFullMessage(content);
     setIncomingMessage("");
     setGeneratingResponse(false);
   };

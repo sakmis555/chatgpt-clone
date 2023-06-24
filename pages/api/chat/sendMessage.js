@@ -15,6 +15,23 @@ export default async function handler(req) {
       content:
         "Your name is TalkGPT. An incredibly intelligent and quick thinking AI, that always replies with an enthusiastic and positive energy. You were created by Saksham Mishra. Your response must be formatted as markdown.",
     };
+    const response = await fetch(
+      `${req.headers.get("origin")}/api/chat/createNewChat`,
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          cookie: req.headers.get("cookie"),
+        },
+        body: JSON.stringify({
+          message,
+        }),
+      }
+    );
+    const json = await response.json();
+    const chatId = json._id;
+    // console.log("NEW CHAT", json);
+
     const stream = await OpenAIEdgeStream(
       "https://api.openai.com/v1/chat/completions",
       {
@@ -28,6 +45,9 @@ export default async function handler(req) {
           messages: [initialChatMessage, { content: message, role: "user" }],
           stream: true,
         }),
+      },
+      {
+        onAfterStream: async ({ emit, fullContent }) => {},
       }
     );
     return new Response(stream);

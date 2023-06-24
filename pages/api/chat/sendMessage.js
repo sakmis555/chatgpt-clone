@@ -47,7 +47,26 @@ export default async function handler(req) {
         }),
       },
       {
-        onAfterStream: async ({ emit, fullContent }) => {},
+        onBeforeStream: ({ emit }) => {
+          emit(chatId, "newChatId");
+        },
+        onAfterStream: async ({ emit, fullContent }) => {
+          await fetch(
+            `${req.headers.get("origin")}/api/chat/addMessageToChat`,
+            {
+              method: "POST",
+              headers: {
+                "content-type": "application/json",
+                cookie: req.headers.get("cookie"),
+              },
+              body: JSON.stringify({
+                chatId,
+                role: "assistant",
+                content: fullContent,
+              }),
+            }
+          );
+        },
       }
     );
     return new Response(stream);

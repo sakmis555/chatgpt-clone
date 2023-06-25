@@ -178,6 +178,7 @@ export const getServerSideProps = async (context) => {
         },
       };
     }
+
     const { user } = await getSession(context.req, context.res);
     const client = await clientPromise;
     const db = client.db("TalkGPT");

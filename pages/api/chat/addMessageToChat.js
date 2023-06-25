@@ -10,9 +10,40 @@ export default async function handler(req, res) {
 
     const { chatId, role, content } = req.body;
 
+    //handling for invalid mongodb ObjectId
+    let objectId;
+    try {
+      objectId = new ObjectId(chatId);
+    } catch (e) {
+      res.status(422).json({
+        message: "Invalid chat ID",
+      });
+      return;
+    }
+
+    // validate content data
+    if (
+      !content ||
+      typeof content !== "string" ||
+      (role === "user" && content.length > 200) ||
+      (role === "assistant" && content.length > 100000)
+    ) {
+      res.status(422).json({
+        message: "Content is required and must be less than 200 character",
+      });
+      return;
+    }
+
+    //validate role
+    if (role !== "user" && role !== "assistant") {
+      res.status(422).json({
+        message: "Role must be either 'either' or 'user' ",
+      });
+      return;
+    }
     const chat = await db.collection("chats").findOneAndUpdate(
       {
-        _id: new ObjectId(chatId),
+        _id: objectId,
         userId: user.sub,
       },
       {

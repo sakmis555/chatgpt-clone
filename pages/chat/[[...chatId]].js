@@ -106,25 +106,25 @@ export default function ChatPage({ chatId, title, messages = [] }) {
       <div className="grid h-screen grid-cols-[260px_1fr] ">
         <ChatSidebar chatId={chatId} />
         <div className="flex flex-col overflow-hidden bg-gray-700">
-          <div className="flex-1 overflow-scroll text-white">
-            {allMessages.map((message) => (
-              <Message
-                key={message._id}
-                role={message.role}
-                content={message.content}
-              />
-            ))}
-            {incomingMessage && !routeHasChanged && (
-              <Message role="assistant" content={incomingMessage} />
-            )}
-            {
-              routeHasChanged && incomingMessage && (
+          <div className="flex flex-1 flex-col-reverse overflow-scroll text-white">
+            <div className="mb-auto">
+              {allMessages.map((message) => (
                 <Message
-                  role="notice"
-                content="ONLY ONE MESSAGE AT A TIME, PLEASE ALLOW ANY OTHER RESPONSES TO COMPLETE BEFORE SENDING ANOTHER MESSAGE!!"
+                  key={message._id}
+                  role={message.role}
+                  content={message.content}
                 />
-              )
-            }
+              ))}
+              {incomingMessage && !routeHasChanged && (
+                <Message role="assistant" content={incomingMessage} />
+              )}
+            </div>
+            {routeHasChanged && incomingMessage && (
+              <Message
+                role="notice"
+                content="ONLY ONE MESSAGE AT A TIME, PLEASE ALLOW ANY OTHER RESPONSES TO COMPLETE BEFORE SENDING ANOTHER MESSAGE!!"
+              />
+            )}
           </div>
           <footer className="bg-gray-800 p-10 ">
             <form onSubmit={handleSubmit}>

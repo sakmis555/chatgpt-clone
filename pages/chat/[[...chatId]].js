@@ -167,6 +167,17 @@ export default function ChatPage({ chatId, title, messages = [] }) {
 export const getServerSideProps = async (context) => {
   const chatId = context.params?.chatId?.[0] || null;
   if (chatId) {
+    //handling for invalid mongodb ObjectId
+    let objectId;
+    try {
+      objectId = new ObjectId(chatId);
+    } catch (e) {
+      return {
+        redirect: {
+          destination: "/chat",
+        },
+      };
+    }
     const { user } = await getSession(context.req, context.res);
     const client = await clientPromise;
     const db = client.db("TalkGPT");
@@ -174,6 +185,15 @@ export const getServerSideProps = async (context) => {
       userId: user.sub,
       _id: new ObjectId(chatId),
     });
+
+    //checking for the invalid chatId (chatId Page)
+    if (!chat) {
+      return {
+        redirect: {
+          destination: "/chat",
+        },
+      };
+    }
     return {
       props: {
         chatId,

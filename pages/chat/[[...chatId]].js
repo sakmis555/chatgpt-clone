@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
 
 export default function ChatPage({ chatId, title, messages = [] }) {
-  console.log("PROPS:", title, messages);
+  // console.log("PROPS:", title, messages);
   const [messageText, setMessageText] = useState("");
   const [incomingMessage, setIncomingMessage] = useState("");
   const [newChatMessages, setNewChatMessages] = useState([]);
@@ -85,7 +85,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
     const reader = data.getReader();
     let content = "";
     await streamReader(reader, (message) => {
-      console.log("message", message);
+      // console.log("message", message);
       if (message.event === "newChatId") {
         setNewChatId(message.content);
       } else {
@@ -99,6 +99,11 @@ export default function ChatPage({ chatId, title, messages = [] }) {
     setGeneratingResponse(false);
   };
 
+  const handleKeyUp = (e) => {
+    if (e.keyCode === 13) {
+      handleSubmit(e);
+    }
+  };
   const allMessages = [...messages, ...newChatMessages];
   return (
     <>
@@ -149,6 +154,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
                 <textarea
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
+                  onKeyDown={handleKeyUp}
                   placeholder={generatingResponse ? "" : "Send a message..."}
                   className="w-full resize-none rounded-md bg-gray-700 p-2 text-white focus:border-emerald-500 focus:bg-gray-600 focus:outline focus:outline-emerald-500"
                 />

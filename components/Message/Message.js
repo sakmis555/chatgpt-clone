@@ -6,7 +6,7 @@ import { ReactMarkdown } from "react-markdown/lib/react-markdown";
 
 export const Message = ({ role, content }) => {
   const { user } = useUser();
-  console.log(user);
+  // console.log(user);
   return (
     <div
       className={`grid grid-cols-[30px_1fr] gap-5 p-5 ${

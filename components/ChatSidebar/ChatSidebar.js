@@ -16,7 +16,7 @@ export const ChatSidebar = ({ chatId }) => {
         method: "POST",
       });
       const json = await response.json();
-      console.log("CHAT LIST", json);
+      // console.log("CHAT LIST", json);
       setChatList(json?.chats || []);
     };
     loadChatList();
@@ -30,7 +30,7 @@ export const ChatSidebar = ({ chatId }) => {
         <FontAwesomeIcon icon={faPlus} /> New chat
       </Link>
       <div className="flex-1 overflow-auto bg-gray-950">
-        {console.log(chatList.length)}
+        {/* {console.log(chatList.length)} */}
         {chatList.map((chat) => (
           <Link
             href={`/chat/${chat._id}`}
@@ -49,7 +49,10 @@ export const ChatSidebar = ({ chatId }) => {
           </Link>
         ))}
       </div>
-      <Link href="/api/auth/logout" className="side-menu-item bg-red-500">
+      <Link
+        href="/api/auth/logout"
+        className="side-menu-item bg-red-500 hover:bg-red-400"
+      >
         <FontAwesomeIcon icon={faRightFromBracket} /> Logout
       </Link>
     </div>

@@ -7,7 +7,7 @@ export const config = {
 
 export default async function handler(req) {
   try {
-    console.log("random text before handler func");
+    // console.log("random text before handler func");
     const { chatId: chatIdFromParam, message } = await req.json();
 
     // validate message data
@@ -22,7 +22,7 @@ export default async function handler(req) {
       );
     }
     let chatId = chatIdFromParam;
-    console.log(message);
+    // console.log(message);
     const initialChatMessage = {
       role: "system",
       content:
